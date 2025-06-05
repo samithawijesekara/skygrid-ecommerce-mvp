@@ -71,6 +71,7 @@
     "react-toastify": "^11.0.3",
     "recharts": "^2.15.1",
     "sanitize-html": "^2.14.0",
+    "sonner": "^2.0.5",
     "stripe": "^17.7.0",
     "superjson": "^2.2.2",
     "tailwind-merge": "^2.6.0",
