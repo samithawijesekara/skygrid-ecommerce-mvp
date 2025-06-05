@@ -2,7 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Search, ShoppingBag, User, Menu } from "lucide-react";
+import {
+  Search,
+  ShoppingBag,
+  User,
+  Menu,
+  Home,
+  Grid3X3,
+  Info,
+  MessageCircle,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
@@ -33,27 +42,38 @@ export function Header() {
           <nav className="hidden md:flex items-center space-x-8">
             <Link
               href="/"
-              className="text-sm font-medium hover:text-primary transition-colors"
+              className="flex items-center space-x-1 text-sm font-medium hover:text-primary transition-colors"
             >
-              Home
+              <Home className="h-4 w-4" />
+              <span>Home</span>
             </Link>
             <Link
               href="/shop"
-              className="text-sm font-medium hover:text-primary transition-colors"
+              className="flex items-center space-x-1 text-sm font-medium hover:text-primary transition-colors"
             >
-              Shop
+              <ShoppingBag className="h-4 w-4" />
+              <span>Shop</span>
             </Link>
             <Link
               href="/categories"
-              className="text-sm font-medium hover:text-primary transition-colors"
+              className="flex items-center space-x-1 text-sm font-medium hover:text-primary transition-colors"
             >
-              Categories
+              <Grid3X3 className="h-4 w-4" />
+              <span>Categories</span>
             </Link>
             <Link
               href="/about"
-              className="text-sm font-medium hover:text-primary transition-colors"
+              className="flex items-center space-x-1 text-sm font-medium hover:text-primary transition-colors"
             >
-              About
+              <Info className="h-4 w-4" />
+              <span>About</span>
+            </Link>
+            <Link
+              href="/contact"
+              className="flex items-center space-x-1 text-sm font-medium hover:text-primary transition-colors"
+            >
+              <MessageCircle className="h-4 w-4" />
+              <span>Contact</span>
             </Link>
           </nav>
 
@@ -107,33 +127,45 @@ export function Header() {
                 <nav className="flex flex-col space-y-4 mt-8">
                   <Link
                     href="/"
-                    className="text-lg font-medium hover:text-primary transition-colors"
+                    className="flex items-center space-x-2 text-lg font-medium hover:text-primary transition-colors"
                   >
-                    Home
+                    <Home className="h-5 w-5" />
+                    <span>Home</span>
                   </Link>
                   <Link
                     href="/shop"
-                    className="text-lg font-medium hover:text-primary transition-colors"
+                    className="flex items-center space-x-2 text-lg font-medium hover:text-primary transition-colors"
                   >
-                    Shop
+                    <ShoppingBag className="h-5 w-5" />
+                    <span>Shop</span>
                   </Link>
                   <Link
                     href="/categories"
-                    className="text-lg font-medium hover:text-primary transition-colors"
+                    className="flex items-center space-x-2 text-lg font-medium hover:text-primary transition-colors"
                   >
-                    Categories
+                    <Grid3X3 className="h-5 w-5" />
+                    <span>Categories</span>
                   </Link>
                   <Link
                     href="/about"
-                    className="text-lg font-medium hover:text-primary transition-colors"
+                    className="flex items-center space-x-2 text-lg font-medium hover:text-primary transition-colors"
                   >
-                    About
+                    <Info className="h-5 w-5" />
+                    <span>About</span>
+                  </Link>
+                  <Link
+                    href="/contact"
+                    className="flex items-center space-x-2 text-lg font-medium hover:text-primary transition-colors"
+                  >
+                    <MessageCircle className="h-5 w-5" />
+                    <span>Contact</span>
                   </Link>
                   <Link
                     href="/profile"
-                    className="text-lg font-medium hover:text-primary transition-colors"
+                    className="flex items-center space-x-2 text-lg font-medium hover:text-primary transition-colors"
                   >
-                    Profile
+                    <User className="h-5 w-5" />
+                    <span>Profile</span>
                   </Link>
                 </nav>
               </SheetContent>
