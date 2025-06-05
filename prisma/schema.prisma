@@ -1,0 +1,219 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+/**
+ * **********************************************************
+ * ================== Common Database Modals ===================
+ * **********************************************************
+ */
+enum Role {
+  SUPER_ADMIN
+  TENANT_ADMIN
+  USER
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  PAST_DUE
+  UNPAID
+  TRIAL
+  EXPIRED
+}
+
+enum PlanType {
+  FREE
+  PRO_MONTHLY
+  PRO_ANNUAL
+}
+
+model User {
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  firstName          String?
+  lastName           String?
+  email              String?   @unique
+  emailVerified      DateTime?
+  hashedPassword     String?
+  roles              Role[]    @default([USER])
+  otp                String?
+  otpExpiry          DateTime?
+  token              String?
+  isAccountActivate  Boolean   @default(false)
+  isWelcomeEmailSent Boolean   @default(false)
+  profileImage       String?
+  // defaultTenant     String?   @db.ObjectId
+  // tenants           String[]  @db.ObjectId
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  deletedAt          DateTime?
+
+  accounts      Account[]
+  invitations   Invitation[]   @relation("UserInvitations")
+  blogs         Blog[]
+  categories    Category[]
+  subscriptions Subscription[]
+  payments      Payment[]
+}
+
+model Account {
+  id                String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId            String  @db.ObjectId
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.String
+  access_token      String? @db.String
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.String
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Invitation {
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  token      String?   @unique
+  userId     String?   @db.ObjectId
+  userRoleId String?   @db.ObjectId
+  tenantId   String?   @db.ObjectId
+  acceptedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
+
+  user     User?         @relation(fields: [userId], references: [id], onDelete: Cascade, name: "UserInvitations")
+  userRole UserRoleType? @relation(fields: [userRoleId], references: [id], onDelete: Cascade)
+}
+
+model Category {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  name        String    @unique
+  description String?
+  createdById String    @db.ObjectId
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  createdBy User           @relation(fields: [createdById], references: [id])
+  blogs     BlogCategory[]
+}
+
+model Blog {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  title       String    @unique
+  coverImage  String?
+  content     String
+  createdById String    @db.ObjectId
+  isPublished Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  createdBy  User           @relation(fields: [createdById], references: [id])
+  categories BlogCategory[]
+}
+
+model BlogCategory {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  blogId     String @db.ObjectId
+  categoryId String @db.ObjectId
+
+  blog     Blog     @relation(fields: [blogId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@unique([blogId, categoryId])
+}
+
+model SubscriptionPlan {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  name          String
+  description   String?
+  planType      PlanType
+  price         Float
+  currency      String    @default("USD")
+  interval      String // 'month' or 'year'
+  stripePriceId String    @unique
+  features      String[]
+  isActive      Boolean   @default(true)
+  trialDays     Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  subscriptions Subscription[]
+}
+
+model Subscription {
+  id                   String             @id @default(auto()) @map("_id") @db.ObjectId
+  userId               String             @db.ObjectId
+  planId               String             @db.ObjectId
+  status               SubscriptionStatus
+  stripeCustomerId     String?
+  stripeSubscriptionId String?
+  currentPeriodStart   DateTime
+  currentPeriodEnd     DateTime
+  cancelAtPeriodEnd    Boolean            @default(false)
+  trialStart           DateTime?
+  trialEnd             DateTime?
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  deletedAt            DateTime?
+
+  user User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan SubscriptionPlan @relation(fields: [planId], references: [id])
+}
+
+model Payment {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId          String   @db.ObjectId
+  amount          Float
+  currency        String   @default("USD")
+  stripePaymentId String   @unique
+  status          String // succeeded, pending, failed
+  paymentMethod   String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/**
+ * **********************************************************
+ * ================ Types Database Modals ===================
+ * **********************************************************
+ */
+model CountryType {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  countryId Int       @unique
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+model UserRoleType {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  roleId    Int       @unique
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  invitations Invitation[]
+}

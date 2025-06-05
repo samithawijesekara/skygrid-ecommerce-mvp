@@ -1,0 +1,14 @@
+[
+  {
+    "name": "SUPER_ADMIN",
+    "roleId": 1
+  },
+  {
+    "name": "TENANT_ADMIN",
+    "roleId": 2
+  },
+  {
+    "name": "USER",
+    "roleId": 3
+  }
+]
