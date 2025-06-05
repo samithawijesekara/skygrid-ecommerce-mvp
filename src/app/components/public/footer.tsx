@@ -1,115 +1,121 @@
-import Image from "next/image";
-import { FaFacebook, FaInstagram, FaLinkedin, FaTwitter } from "react-icons/fa";
+import Link from "next/link";
+import { Facebook, Twitter, Instagram, Mail } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
-const sections = [
-  {
-    title: "Product",
-    links: [
-      { name: "Overview", href: "#" },
-      { name: "Pricing", href: "#" },
-      { name: "Marketplace", href: "#" },
-      { name: "Features", href: "#" },
-    ],
-  },
-  {
-    title: "Company",
-    links: [
-      { name: "About", href: "#" },
-      { name: "Team", href: "#" },
-      { name: "Blog", href: "#" },
-      { name: "Careers", href: "#" },
-    ],
-  },
-  {
-    title: "Resources",
-    links: [
-      { name: "Help", href: "#" },
-      { name: "Sales", href: "#" },
-      { name: "Advertise", href: "#" },
-      { name: "Privacy", href: "#" },
-    ],
-  },
-];
-
-const Footer = () => {
+export function Footer() {
   return (
-    <section className="py-32 w-full">
-      <div className="w-full px-6 lg:px-12">
-        <footer>
-          <div className="flex flex-col items-center justify-between gap-10 text-center lg:flex-row lg:text-left">
-            <div className="flex w-full max-w-96 shrink flex-col items-center justify-between gap-6 lg:items-start">
-              <div>
-                <span className="flex items-center justify-center gap-4 lg:justify-start">
-                  <Image
-                    src="https://shadcnblocks.com/images/block/block-1.svg"
-                    alt="logo"
-                    className="h-11"
-                    width={100}
-                    height={100}
-                  />
-                  <p className="text-3xl font-semibold">CafeTrail</p>
+    <footer className="bg-muted/50 border-t">
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          {/* Brand */}
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <div className="h-8 w-8 bg-primary rounded-md flex items-center justify-center">
+                <span className="text-primary-foreground font-bold text-sm">
+                  MS
                 </span>
-                <p className="mt-6 text-sm text-muted-foreground">
-                  A collection of 100+ responsive HTML templates for your
-                  startup business or side project.
-                </p>
               </div>
-              <ul className="flex items-center space-x-6 text-muted-foreground">
-                <li className="font-medium hover:text-primary">
-                  <a href="#">
-                    <FaInstagram className="size-6" />
-                  </a>
-                </li>
-                <li className="font-medium hover:text-primary">
-                  <a href="#">
-                    <FaFacebook className="size-6" />
-                  </a>
-                </li>
-                <li className="font-medium hover:text-primary">
-                  <a href="#">
-                    <FaTwitter className="size-6" />
-                  </a>
-                </li>
-                <li className="font-medium hover:text-primary">
-                  <a href="#">
-                    <FaLinkedin className="size-6" />
-                  </a>
-                </li>
-              </ul>
+              <span className="font-bold text-xl">Modern Store</span>
             </div>
-            <div className="grid grid-cols-3 gap-6 lg:gap-20">
-              {sections.map((section, sectionIdx) => (
-                <div key={sectionIdx}>
-                  <h3 className="mb-6 font-bold">{section.title}</h3>
-                  <ul className="space-y-4 text-sm text-muted-foreground">
-                    {section.links.map((link, linkIdx) => (
-                      <li
-                        key={linkIdx}
-                        className="font-medium hover:text-primary"
-                      >
-                        <a href={link.href}>{link.name}</a>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
+            <p className="text-muted-foreground text-sm">
+              Premium quality products with modern shopping experience. Discover
+              the best deals and latest trends.
+            </p>
+            <div className="flex space-x-2">
+              <Button variant="ghost" size="icon">
+                <Facebook className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon">
+                <Twitter className="h-4 w-4" />
+              </Button>
+              <Button variant="ghost" size="icon">
+                <Instagram className="h-4 w-4" />
+              </Button>
             </div>
           </div>
-          <div className="mt-20 flex flex-col justify-between gap-4 border-t pt-8 text-center text-sm font-medium text-muted-foreground lg:flex-row lg:items-center lg:text-left">
-            <p>© 2024 CafeTrail. All rights reserved.</p>
-            <ul className="flex justify-center gap-4 lg:justify-start">
-              <li className="hover:text-primary">
-                <a href="#"> Terms and Conditions</a>
-              </li>
-              <li className="hover:text-primary">
-                <a href="#"> Privacy Policy</a>
-              </li>
-            </ul>
-          </div>
-        </footer>
-      </div>
-    </section>
-  );
-};
 
-export default Footer;
+          {/* Quick Links */}
+          <div className="space-y-4">
+            <h3 className="font-semibold">Quick Links</h3>
+            <div className="space-y-2 text-sm">
+              <Link
+                href="/shop"
+                className="block text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Shop
+              </Link>
+              <Link
+                href="/categories"
+                className="block text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Categories
+              </Link>
+              <Link
+                href="/deals"
+                className="block text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Deals
+              </Link>
+              <Link
+                href="/new-arrivals"
+                className="block text-muted-foreground hover:text-foreground transition-colors"
+              >
+                New Arrivals
+              </Link>
+            </div>
+          </div>
+
+          {/* Customer Service */}
+          <div className="space-y-4">
+            <h3 className="font-semibold">Customer Service</h3>
+            <div className="space-y-2 text-sm">
+              <Link
+                href="/contact"
+                className="block text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Contact Us
+              </Link>
+              <Link
+                href="/shipping"
+                className="block text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Shipping Info
+              </Link>
+              <Link
+                href="/returns"
+                className="block text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Returns
+              </Link>
+              <Link
+                href="/faq"
+                className="block text-muted-foreground hover:text-foreground transition-colors"
+              >
+                FAQ
+              </Link>
+            </div>
+          </div>
+
+          {/* Newsletter */}
+          <div className="space-y-4">
+            <h3 className="font-semibold">Stay Updated</h3>
+            <p className="text-sm text-muted-foreground">
+              Subscribe to get special offers and updates.
+            </p>
+            <div className="flex space-x-2">
+              <Input placeholder="Enter your email" className="flex-1" />
+              <Button size="icon">
+                <Mail className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t mt-8 pt-8 text-center text-sm text-muted-foreground">
+          <p>&copy; 2024 Modern Store. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
