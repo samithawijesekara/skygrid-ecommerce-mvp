@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
   try {
     // Parse the request body
     const body = await request.json();
-    const { email, firstName, lastName, password } = body;
+    const { email, firstName, lastName, password, agreeToTerms } = body;
 
     // Check if all required fields are provided
     if (!email || !firstName || !lastName || !password) {
@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
         otpExpiry,
         profileImage:
           "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png",
+        isAgreeToTerms: agreeToTerms,
       },
     });
 

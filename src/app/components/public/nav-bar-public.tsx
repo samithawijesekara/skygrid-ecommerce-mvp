@@ -104,7 +104,7 @@ const NavbarPublic = () => {
                 height={100}
               />
               <span className="text-lg font-semibold bg-gradient-to-r from-[#30d9a9] to-[#f5b84d] bg-clip-text text-transparent">
-                CafeTrail
+                E-commerce MVP
               </span>
             </div>
             <div className="flex items-center">
@@ -218,7 +218,7 @@ const NavbarPublic = () => {
                 height={100}
               />
               <span className="text-lg font-semibold bg-gradient-to-r from-[#30d9a9] to-[#f5b84d] bg-clip-text text-transparent">
-                CafeTrail
+                E-commerce MVP
               </span>
             </div>
             <Sheet>
@@ -239,7 +239,7 @@ const NavbarPublic = () => {
                         height={100}
                       />
                       <span className="text-lg font-semibold bg-gradient-to-r from-[#30d9a9] to-[#f5b84d] bg-clip-text text-transparent">
-                        CafeTrail
+                        E-commerce MVP
                       </span>
                     </div>
                   </SheetTitle>

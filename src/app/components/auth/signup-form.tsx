@@ -1,75 +1,87 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Separator } from "@/components/ui/separator"
-import { useToast } from "@/components/ui/use-toast"
-import { Mail, Lock, User, Eye, EyeOff } from "lucide-react"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/components/ui/use-toast";
+import { Mail, Lock, User, Eye, EyeOff, Loader2 } from "lucide-react";
+import { AUTH_ROUTES, PUBLIC_ROUTES } from "@/constants/router.const";
+import Link from "next/link";
+import axios from "axios";
+import {
+  Controller,
+  FieldValues,
+  SubmitHandler,
+  useForm,
+} from "react-hook-form";
+import { signIn } from "next-auth/react";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import { usePasswordToggle } from "@/hooks/use-password-toggle";
 
 interface SignupFormProps {
-  onSuccess: () => void
+  onSuccess: () => void;
 }
 
 export function SignupForm({ onSuccess }: SignupFormProps) {
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-    agreeToTerms: false,
-  })
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingGoogleSignIn, setIsLoadingGoogleSignIn] = useState(false);
+  const { showPassword, togglePasswordVisibility } = usePasswordToggle();
 
-  const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
+  const {
+    control,
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+    getValues,
+  } = useForm<FieldValues>({
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      agreeToTerms: false,
+    },
+  });
 
-  const { toast } = useToast()
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Passwords don't match",
-        variant: "destructive",
-      })
-      return
+  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    setIsLoading(true);
+    try {
+      const response = await axios.post("/api/auth/signup", data);
+      if (response?.statusText === "OK") {
+        reset();
+        toast.success(
+          "Sign up successful! Please check your email to verify your account."
+        );
+        setTimeout(() => {
+          if (response?.data) {
+            router.push(
+              `${AUTH_ROUTES.OTP_VERIFICATION}?email=${response?.data?.email}`
+            );
+          }
+        }, 1000);
+      }
+    } catch (error: unknown) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || "Error occurred!");
+      } else {
+        toast.error("An unknown error occurred!");
+      }
+    } finally {
+      setIsLoading(false);
     }
-
-    if (!formData.agreeToTerms) {
-      toast({
-        title: "Error",
-        description: "Please agree to the terms and conditions",
-        variant: "destructive",
-      })
-      return
-    }
-
-    setIsLoading(true)
-
-    // Simulate signup
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-
-    toast({
-      title: "Success",
-      description: "Account created successfully!",
-    })
-    onSuccess()
-    setIsLoading(false)
-  }
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="firstName">First Name</Label>
@@ -77,13 +89,21 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
             <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
               id="firstName"
-              placeholder="First name"
-              value={formData.firstName}
-              onChange={(e) => handleInputChange("firstName", e.target.value)}
+              type="text"
+              placeholder="John"
+              {...register("firstName", {
+                required: "First name is required",
+              })}
               className="pl-10"
-              required
             />
           </div>
+          {errors.firstName?.message && (
+            <p className="text-red-500 text-sm">
+              {typeof errors.firstName?.message === "string"
+                ? errors.firstName?.message
+                : "Invalid First Name"}
+            </p>
+          )}
         </div>
         <div className="space-y-2">
           <Label htmlFor="lastName">Last Name</Label>
@@ -91,13 +111,21 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
             <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
             <Input
               id="lastName"
-              placeholder="Last name"
-              value={formData.lastName}
-              onChange={(e) => handleInputChange("lastName", e.target.value)}
+              type="text"
+              placeholder="Doe"
+              {...register("lastName", {
+                required: "Last name is required",
+              })}
               className="pl-10"
-              required
             />
           </div>
+          {errors.lastName?.message && (
+            <p className="text-red-500 text-sm">
+              {typeof errors.lastName?.message === "string"
+                ? errors.lastName?.message
+                : "Invalid Last Name"}
+            </p>
+          )}
         </div>
       </div>
 
@@ -108,13 +136,24 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
           <Input
             id="email"
             type="email"
-            placeholder="Enter your email"
-            value={formData.email}
-            onChange={(e) => handleInputChange("email", e.target.value)}
+            placeholder="m@example.com"
+            {...register("email", {
+              required: "Email is required",
+              pattern: {
+                value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                message: "Invalid email address",
+              },
+            })}
             className="pl-10"
-            required
           />
         </div>
+        {errors.email?.message && (
+          <p className="text-red-500 text-sm">
+            {typeof errors.email?.message === "string"
+              ? errors.email?.message
+              : "Invalid Email"}
+          </p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -124,22 +163,32 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
           <Input
             id="password"
             type={showPassword ? "text" : "password"}
-            placeholder="Create a password"
-            value={formData.password}
-            onChange={(e) => handleInputChange("password", e.target.value)}
+            {...register("password", {
+              required: "Password is required",
+            })}
             className="pl-10 pr-10"
-            required
           />
           <Button
             type="button"
             variant="ghost"
             size="icon"
             className="absolute right-0 top-0 h-full px-3"
-            onClick={() => setShowPassword(!showPassword)}
+            onClick={togglePasswordVisibility}
           >
-            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            {showPassword ? (
+              <EyeOff className="h-4 w-4" />
+            ) : (
+              <Eye className="h-4 w-4" />
+            )}
           </Button>
         </div>
+        {errors.password?.message && (
+          <p className="text-red-500 text-sm">
+            {typeof errors.password?.message === "string"
+              ? errors.password?.message
+              : "Invalid Password"}
+          </p>
+        )}
       </div>
 
       <div className="space-y-2">
@@ -148,41 +197,69 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
           <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
           <Input
             id="confirmPassword"
-            type={showConfirmPassword ? "text" : "password"}
-            placeholder="Confirm your password"
-            value={formData.confirmPassword}
-            onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+            type={showPassword ? "text" : "password"}
+            {...register("confirmPassword", {
+              required: "Confirm password is required",
+              validate: (value) =>
+                value === getValues("password") || "Passwords do not match",
+            })}
             className="pl-10 pr-10"
-            required
           />
           <Button
             type="button"
             variant="ghost"
             size="icon"
             className="absolute right-0 top-0 h-full px-3"
-            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            onClick={togglePasswordVisibility}
           >
-            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+            {showPassword ? (
+              <EyeOff className="h-4 w-4" />
+            ) : (
+              <Eye className="h-4 w-4" />
+            )}
           </Button>
         </div>
+        {errors.password?.message && (
+          <p className="text-red-500 text-sm">
+            {typeof errors.password?.message === "string"
+              ? errors.password?.message
+              : "Invalid Password"}
+          </p>
+        )}
       </div>
 
-      <div className="flex items-center space-x-2">
-        <Checkbox
-          id="agreeToTerms"
-          checked={formData.agreeToTerms}
-          onCheckedChange={(checked) => handleInputChange("agreeToTerms", checked as boolean)}
-        />
-        <Label htmlFor="agreeToTerms" className="text-sm">
-          I agree to the{" "}
-          <Button variant="link" className="p-0 h-auto text-sm">
-            Terms of Service
-          </Button>{" "}
-          and{" "}
-          <Button variant="link" className="p-0 h-auto text-sm">
-            Privacy Policy
-          </Button>
-        </Label>
+      <div className="flex flex-col">
+        <div className="flex items-center space-x-2">
+          <Controller
+            name="agreeToTerms"
+            control={control}
+            rules={{ required: "You must agree to the terms" }}
+            render={({ field: { onChange, value }, fieldState: { error } }) => (
+              <div>
+                <Checkbox
+                  id="agreeToTerms"
+                  checked={value}
+                  onCheckedChange={onChange}
+                />
+              </div>
+            )}
+          />
+          <Label htmlFor="agreeToTerms" className="text-sm">
+            I agree to the{" "}
+            <Button variant="link" className="p-0 h-auto text-sm">
+              Terms of Service
+            </Button>{" "}
+            and{" "}
+            <Button variant="link" className="p-0 h-auto text-sm">
+              Privacy Policy
+            </Button>
+          </Label>
+        </div>
+        {errors.agreeToTerms && (
+          <p className="text-red-500 text-sm">
+            {String(errors.agreeToTerms.message)}
+          </p>
+        )}
       </div>
 
       <Button type="submit" className="w-full" disabled={isLoading}>
@@ -194,31 +271,50 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
           <Separator className="w-full" />
         </div>
         <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+          <span className="bg-background px-2 text-muted-foreground">
+            Or continue with
+          </span>
         </div>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <Button variant="outline" type="button">
-          <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
-            <path
-              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              fill="#4285F4"
-            />
-            <path
-              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              fill="#34A853"
-            />
-            <path
-              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-              fill="#FBBC05"
-            />
-            <path
-              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-              fill="#EA4335"
-            />
-          </svg>
-          Google
+        <Button
+          variant="outline"
+          type="button"
+          onClick={(e) => {
+            e.preventDefault();
+            setIsLoadingGoogleSignIn(true);
+            signIn("google").finally(() => setIsLoadingGoogleSignIn(false));
+          }}
+          disabled={isLoadingGoogleSignIn}
+        >
+          {isLoadingGoogleSignIn ? (
+            <>
+              <Loader2 className="animate-spin" /> Please wait
+            </>
+          ) : (
+            <>
+              <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
+                <path
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+                  fill="#4285F4"
+                />
+                <path
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                  fill="#34A853"
+                />
+                <path
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                  fill="#FBBC05"
+                />
+                <path
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                  fill="#EA4335"
+                />
+              </svg>
+              Login with Google
+            </>
+          )}
         </Button>
         <Button variant="outline" type="button">
           <svg className="mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -228,5 +324,5 @@ export function SignupForm({ onSuccess }: SignupFormProps) {
         </Button>
       </div>
     </form>
-  )
+  );
 }

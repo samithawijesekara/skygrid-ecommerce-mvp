@@ -53,6 +53,7 @@ model User {
   isAccountActivate  Boolean   @default(false)
   isWelcomeEmailSent Boolean   @default(false)
   profileImage       String?
+  isAgreeToTerms       Boolean   @default(false)
   // defaultTenant     String?   @db.ObjectId
   // tenants           String[]  @db.ObjectId
   createdAt          DateTime  @default(now())
