@@ -9,7 +9,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import axios from "axios";
-import { AUTH_ROUTES } from "@/constants/router.const";
+import { AUTH_ROUTES, PUBLIC_ROUTES } from "@/constants/router.const";
 
 export function ResetPasswordForm() {
   const router = useRouter();
@@ -89,7 +89,7 @@ export function ResetPasswordForm() {
         </p>
         <Button
           className="w-full"
-          onClick={() => router.push("/?login=true")}
+          onClick={() => router.push(`${PUBLIC_ROUTES.HOME}?login=true`)}
         >
           Go to Login
         </Button>

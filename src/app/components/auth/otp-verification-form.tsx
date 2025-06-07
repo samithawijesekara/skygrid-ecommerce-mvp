@@ -87,7 +87,7 @@ export function OtpVerificationForm({
         toast.success("OTP Verification successful!");
         setTimeout(() => {
           if (response?.data) {
-            router.push(PUBLIC_ROUTES.HOME);
+            router.push(`${PUBLIC_ROUTES.HOME}?login=true`);
           }
         }, 1000);
       }
@@ -130,7 +130,7 @@ export function OtpVerificationForm({
   return (
     <form
       onSubmit={handleSubmit(onSubmit)}
-      className={cn("space-y-4 max-w-md mx-auto mt-12", className)}
+      className={cn("space-y-4 max-w-md mx-auto mt-32", className)}
       {...props}
     >
       <div className="text-center mb-4">
