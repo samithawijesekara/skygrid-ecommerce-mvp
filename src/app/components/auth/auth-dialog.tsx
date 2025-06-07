@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import React, { useState, type Dispatch, type SetStateAction } from "react";
 import {
   Dialog,
   DialogContent,
@@ -13,24 +13,32 @@ import { LoginForm } from "./login-form";
 import { SignupForm } from "./signup-form";
 
 interface AuthDialogProps {
-  children: ReactNode;
+  open: boolean;
+  setOpen: Dispatch<SetStateAction<boolean>>;
+  defaultTab: string;
+  children?: React.ReactNode;
 }
 
-export function AuthDialog({ children }: AuthDialogProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function AuthDialog({ open, setOpen, defaultTab, children }: AuthDialogProps) {
+  const [tab, setTab] = useState(defaultTab);
+
+  // Keep tab in sync with defaultTab prop
+  React.useEffect(() => {
+    setTab(defaultTab);
+  }, [defaultTab]);
 
   const handleClose = () => {
-    setIsOpen(false);
+    setOpen(false);
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+    <Dialog open={open} onOpenChange={setOpen}>
+      {children && <DialogTrigger asChild>{children}</DialogTrigger>}
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Welcome to Modern Store</DialogTitle>
         </DialogHeader>
-        <Tabs defaultValue="login" className="w-full">
+        <Tabs value={tab} onValueChange={setTab} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="login">Login</TabsTrigger>
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
