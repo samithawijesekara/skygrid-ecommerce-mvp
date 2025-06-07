@@ -20,6 +20,8 @@ import { AuthDialog } from "@/components/auth/auth-dialog";
 import { useCart } from "@/components/cart/cart-context";
 
 export function Header() {
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [defaultTab, setDefaultTab] = useState("login");
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { items } = useCart();
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -98,7 +100,11 @@ export function Header() {
             </Button>
 
             {/* Auth */}
-            <AuthDialog>
+            <AuthDialog
+              open={isAuthOpen}
+              setOpen={setIsAuthOpen}
+              defaultTab={defaultTab}
+            >
               <Button variant="ghost" size="icon">
                 <User className="h-5 w-5" />
               </Button>

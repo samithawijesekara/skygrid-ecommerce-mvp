@@ -2,9 +2,6 @@
 =============== Authentication Flow Routes ==================
 ************************************************************/
 export const AUTH_ROUTES = {
-  SIGN_UP: "/signup",
-  LOG_IN: "/login",
-  FORGOT_PASSWORD: "/forgot-password",
   RESET_PASSWORD: "/reset-password",
   OTP_VERIFICATION: "/otp-verification",
   INVITATION: "/signup/invitation",
@@ -22,6 +19,10 @@ export const PUBLIC_ROUTES = {
   TERMS_CONDITIONS: "/terms-conditions",
   BLOG: "/blog",
   UNAUTHORIZED: "/unauthorize",
+  SHOP: "/shop",
+  CATEGORIES: "/categories",
+  ABOUT: "/about",
+  CONTACT: "/contact",
   // Add here another routes...
 } as const;
 
