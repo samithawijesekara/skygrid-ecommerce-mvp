@@ -13,6 +13,9 @@ import { CartProvider } from "@/components/cart/cart-context";
 import { Header } from "@/components/layouts/header";
 import { Footer } from "@/components/public/footer";
 import ToastyProvider from "@/components/loading-spinners/toasty-provider";
+import { useUser } from "src/store/useUser";
+import axios from "axios";
+import { UserInitializer } from "@/components/layouts/user-initializer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,26 +32,14 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Checking the session redirection
-  useEffect(() => {
-    checkSessionRedirection(router, setIsLoading);
-  }, [router]);
-
-  if (isLoading) {
-    return <Spinner />;
-  }
-
   return (
     <html lang="en">
       <CustomHead />
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Suspense fallback={<Spinner />}>
-          <SessionProvider>
+        <SessionProvider>
+          <UserInitializer>
             <CartProvider>
               <div className="min-h-screen flex flex-col">
                 <Header />
@@ -56,8 +47,8 @@ export default function RootLayout({
                 <Footer />
               </div>
             </CartProvider>
-          </SessionProvider>
-        </Suspense>
+          </UserInitializer>
+        </SessionProvider>
         <ToastyProvider />
       </body>
     </html>

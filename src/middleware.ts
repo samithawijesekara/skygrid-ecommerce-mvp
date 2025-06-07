@@ -20,18 +20,7 @@ export default withAuth(
 
     // User with USER role access routes
     if (
-      pathname.startsWith(AUTH_ROUTES.PORTAL_SWITCH) &&
-      !request.nextauth.token &&
-      userRoles.length <= 1
-    ) {
-      return NextResponse.rewrite(
-        new URL(PUBLIC_ROUTES.UNAUTHORIZED, request.url)
-      );
-    }
-
-    // User with USER role access routes
-    if (
-      pathname.startsWith(MAIN_ROUTES.DASHBOARD) &&
+      pathname.startsWith(PUBLIC_ROUTES.PROFILE) &&
       !userRoles.includes(UserRoleEnum.USER)
     ) {
       return NextResponse.rewrite(
@@ -56,5 +45,5 @@ export default withAuth(
 );
 
 export const config = {
-  matcher: ["/super-admin/:path*", "/portal/:path*", "/portal-switch"],
+  matcher: ["/super-admin/:path*", "/profile/:path*"],
 };

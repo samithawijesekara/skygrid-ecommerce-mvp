@@ -11,6 +11,10 @@ import {
   Grid3X3,
   Info,
   MessageCircle,
+  Settings,
+  LogOut,
+  Heart,
+  Truck,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +22,18 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { CartSlider } from "@/components/cart/cart-slider";
 import { AuthDialog } from "@/components/auth/auth-dialog";
 import { useCart } from "@/components/cart/cart-context";
+import { useUser } from "src/store/useUser";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
+import { PUBLIC_ROUTES } from "@/constants/router.const";
+import { clearLocalStorage } from "@/helpers/storage.utils";
+import { signOut } from "next-auth/react";
 
 export function Header() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -25,6 +41,10 @@ export function Header() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { items } = useCart();
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+  const { user } = useUser();
+  const router = useRouter();
+
+  console.log("user", user);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -99,16 +119,78 @@ export function Header() {
               <Search className="h-5 w-5" />
             </Button>
 
-            {/* Auth */}
-            <AuthDialog
-              open={isAuthOpen}
-              setOpen={setIsAuthOpen}
-              defaultTab={defaultTab}
-            >
-              <Button variant="ghost" size="icon">
-                <User className="h-5 w-5" />
-              </Button>
-            </AuthDialog>
+            {user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon" className="relative">
+                    {user.profileImage ? (
+                      <img
+                        src={user.profileImage}
+                        alt="Profile"
+                        className="rounded-full w-8 h-8 object-cover"
+                      />
+                    ) : (
+                      <span className="inline-flex items-center justify-center rounded-full bg-primary text-primary-foreground font-bold w-8 h-8">
+                        {user.firstName?.[0]}
+                        {user.lastName?.[0]}
+                      </span>
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuItem
+                    onClick={() =>
+                      router.push(`${PUBLIC_ROUTES.PROFILE}?tab=orders`)
+                    }
+                  >
+                    <ShoppingBag className="mr-2 h-4 w-4" /> Orders
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() =>
+                      router.push(`${PUBLIC_ROUTES.PROFILE}?tab=shipping`)
+                    }
+                  >
+                    <Truck className="mr-2 h-4 w-4" /> Shipping
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() =>
+                      router.push(`${PUBLIC_ROUTES.PROFILE}?tab=favourites`)
+                    }
+                  >
+                    <Heart className="mr-2 h-4 w-4" /> Favourites
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() =>
+                      router.push(`${PUBLIC_ROUTES.PROFILE}?tab=settings`)
+                    }
+                  >
+                    <Settings className="mr-2 h-4 w-4" /> Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={() => {
+                      clearLocalStorage();
+                      signOut({
+                        callbackUrl: PUBLIC_ROUTES.HOME,
+                      });
+                    }}
+                    className="text-red-600"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" /> Sign out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <AuthDialog
+                open={isAuthOpen}
+                setOpen={setIsAuthOpen}
+                defaultTab={defaultTab}
+              >
+                <Button variant="ghost" size="icon">
+                  <User className="h-5 w-5" />
+                </Button>
+              </AuthDialog>
+            )}
 
             {/* Cart */}
             <CartSlider>

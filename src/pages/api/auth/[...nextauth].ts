@@ -6,7 +6,7 @@ import GoogleProvider from "next-auth/providers/google";
 import prisma from "@/lib/prismadb";
 import LinkedInProvider from "next-auth/providers/linkedin";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import { AUTH_ROUTES } from "@/constants/router.const";
+import { AUTH_ROUTES, PUBLIC_ROUTES } from "@/constants/router.const";
 import { UserRoleEnum } from "@/enums/user-role.enum";
 import { Role } from "@prisma/client";
 import CONFIGURATIONS from "@/configurations/configurations";
@@ -106,8 +106,8 @@ export const authOptions: AuthOptions = {
     }),
   ],
   pages: {
-    signIn: AUTH_ROUTES.LOG_IN, // Callback URL for the log in page
-    signOut: AUTH_ROUTES.LOG_IN, // Callback URL for the log out page
+    signIn: `${PUBLIC_ROUTES.HOME}?login=true`, // Callback URL for the log in page
+    signOut: `${PUBLIC_ROUTES.HOME}`, // Callback URL for the log out page
   },
   debug: CONFIGURATIONS.ENVIRONMENT.NODE_ENV === "development",
   session: {

@@ -23,6 +23,7 @@ export const PUBLIC_ROUTES = {
   CATEGORIES: "/categories",
   ABOUT: "/about",
   CONTACT: "/contact",
+  PROFILE: "/profile",
   // Add here another routes...
 } as const;
 

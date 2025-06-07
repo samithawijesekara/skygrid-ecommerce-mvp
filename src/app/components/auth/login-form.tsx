@@ -79,6 +79,8 @@ export function LoginForm({ onClose }: LoginFormProps) {
       console.log("callback : ", callback);
 
       if (callback?.ok) {
+        onClose?.(); // Call onClose login form
+
         toast.success("Login successful! Welcome back.");
 
         setTimeout(async () => {
@@ -93,12 +95,8 @@ export function LoginForm({ onClose }: LoginFormProps) {
               ? new URL(callbackUrl, window.location.origin).pathname
               : "";
 
-            // Handle multiple roles
-            if (userRoles.length > 1) {
-              router.push(AUTH_ROUTES.PORTAL_SWITCH);
-            }
             // Handle single role scenarios
-            else if (userRoles?.length === 1) {
+            if (userRoles?.length === 1) {
               // For Super Admin
               if (userRoles.includes(UserRoleEnum.SUPER_ADMIN)) {
                 if (callbackPath.startsWith(SUPER_ADMIN_ROUTES.DASHBOARD)) {
@@ -107,17 +105,7 @@ export function LoginForm({ onClose }: LoginFormProps) {
                   router.push(SUPER_ADMIN_ROUTES.DASHBOARD);
                 }
               }
-              // For Tenant Admin
-              else if (userRoles.includes(UserRoleEnum.TENANT_ADMIN)) {
-                if (
-                  callbackPath &&
-                  !callbackPath.startsWith(SUPER_ADMIN_ROUTES.DASHBOARD)
-                ) {
-                  router.push(callbackPath);
-                } else {
-                  router.push(MAIN_ROUTES.DASHBOARD);
-                }
-              }
+
               // For other single roles (default case)
               else {
                 if (
@@ -126,13 +114,13 @@ export function LoginForm({ onClose }: LoginFormProps) {
                 ) {
                   router.push(callbackPath);
                 } else {
-                  router.push(MAIN_ROUTES.DASHBOARD);
+                  router.push(`${PUBLIC_ROUTES.PROFILE}?tab=orders`);
                 }
               }
             }
             // Fallback for no roles (shouldn't typically happen)
             else {
-              router.push(MAIN_ROUTES.DASHBOARD);
+              router.push(`${PUBLIC_ROUTES.PROFILE}?tab=orders`);
               toast.warning("No role assigned to user");
             }
           } catch (sessionError) {
