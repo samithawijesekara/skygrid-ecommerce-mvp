@@ -12,6 +12,7 @@ import { SessionProvider } from "next-auth/react";
 import { CartProvider } from "@/components/cart/cart-context";
 import { Header } from "@/components/layouts/header";
 import { Footer } from "@/components/public/footer";
+import ToastyProvider from "@/components/loading-spinners/toasty-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -57,6 +58,7 @@ export default function RootLayout({
             </CartProvider>
           </SessionProvider>
         </Suspense>
+        <ToastyProvider />
       </body>
     </html>
   );

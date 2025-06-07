@@ -47,12 +47,19 @@ export async function PUT(request: NextRequest) {
     // Hash the new password
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // Find user by ID from decoded token
+    // Find user by ID and check if the token matches
     const user = await prisma.user.findUnique({
       where: { id: decodedToken.id },
     });
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
+    }
+
+    if (!user.token || user.token !== token) {
+      return NextResponse.json(
+        { message: "Invalid or already used reset link." },
+        { status: 400 }
+      );
     }
 
     // Update the user's password and remove the reset token
