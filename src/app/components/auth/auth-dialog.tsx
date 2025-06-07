@@ -19,6 +19,10 @@ interface AuthDialogProps {
 export function AuthDialog({ children }: AuthDialogProps) {
   const [isOpen, setIsOpen] = useState(false);
 
+  const handleClose = () => {
+    setIsOpen(false);
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
@@ -32,10 +36,10 @@ export function AuthDialog({ children }: AuthDialogProps) {
             <TabsTrigger value="signup">Sign Up</TabsTrigger>
           </TabsList>
           <TabsContent value="login">
-            <LoginForm onSuccess={() => setIsOpen(false)} />
+            <LoginForm onClose={handleClose} />
           </TabsContent>
           <TabsContent value="signup">
-            <SignupForm onSuccess={() => setIsOpen(false)} />
+            <SignupForm onSuccess={handleClose} />
           </TabsContent>
         </Tabs>
       </DialogContent>

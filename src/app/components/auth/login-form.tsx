@@ -7,7 +7,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { Mail, Lock, Eye, EyeOff, Loader, Loader2 } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  Eye,
+  EyeOff,
+  Loader,
+  Loader2,
+  ArrowLeft,
+  CheckCircle2,
+} from "lucide-react";
 import {
   AUTH_ROUTES,
   MAIN_ROUTES,
@@ -21,13 +30,21 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { UserRoleEnum } from "@/enums/user-role.enum";
 import { usePasswordToggle } from "@/hooks/use-password-toggle";
 import { Role } from "@prisma/client";
+import axios from "axios";
 
-export function LoginForm() {
+type FormView = "login" | "forgot-password" | "success";
+
+interface LoginFormProps {
+  onClose?: () => void;
+}
+
+export function LoginForm({ onClose }: LoginFormProps) {
   const router = useRouter();
   const searchParams = useSearchParams(); // Get search parameters
   const { showPassword, togglePasswordVisibility } = usePasswordToggle();
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingGoogleSignIn, setIsLoadingGoogleSignIn] = useState(false);
+  const [currentView, setCurrentView] = useState<FormView>("login");
 
   const {
     register,
@@ -38,6 +55,12 @@ export function LoginForm() {
     defaultValues: {
       email: "",
       password: "",
+    },
+  });
+
+  const forgotPasswordForm = useForm<FieldValues>({
+    defaultValues: {
+      email: "",
     },
   });
 
@@ -136,6 +159,123 @@ export function LoginForm() {
     }
   };
 
+  const onForgotPasswordSubmit: SubmitHandler<FieldValues> = async (data) => {
+    try {
+      setIsLoading(true);
+      const response = await axios.post("/api/auth/forgot-password", data);
+
+      toast.success(
+        "Password reset instructions have been sent to your email."
+      );
+      forgotPasswordForm.reset();
+      setCurrentView("success");
+    } catch (error) {
+      console.error("Password reset error:", error);
+      if (axios.isAxiosError(error)) {
+        toast.error(
+          error.response?.data?.message ||
+            "Failed to send password reset instructions. Please try again."
+        );
+      } else {
+        toast.error("An unexpected error occurred. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleBackToLogin = () => {
+    setCurrentView("login");
+    forgotPasswordForm.reset();
+  };
+
+  const handleClose = () => {
+    setCurrentView("login");
+    forgotPasswordForm.reset();
+    onClose?.(); // Call onClose if provided
+  };
+
+  if (currentView === "success") {
+    return (
+      <div className="space-y-4 text-center">
+        <div className="flex justify-center">
+          <CheckCircle2 className="h-16 w-16 text-green-500" />
+        </div>
+        <h2 className="text-2xl font-semibold">Check Your Email</h2>
+        <p className="text-muted-foreground">
+          We've sent password reset instructions to your email address.
+        </p>
+        <Button onClick={handleClose} className="w-full">
+          Close
+        </Button>
+      </div>
+    );
+  }
+
+  if (currentView === "forgot-password") {
+    return (
+      <form
+        onSubmit={forgotPasswordForm.handleSubmit(onForgotPasswordSubmit)}
+        className="space-y-4"
+      >
+        <div className="flex items-center space-x-2">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={handleBackToLogin}
+            className="h-8 w-8"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+          <h2 className="text-lg font-semibold">Forgot Password</h2>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Enter your email address and we'll send you instructions to reset your
+          password.
+        </p>
+        <div className="space-y-2">
+          <Label htmlFor="forgot-email">Email</Label>
+          <div className="relative">
+            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+            <Input
+              id="forgot-email"
+              type="email"
+              placeholder="m@example.com"
+              {...forgotPasswordForm.register("email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+                  message: "Invalid email address",
+                },
+              })}
+              disabled={isLoading}
+              className="pl-10"
+            />
+          </div>
+          {forgotPasswordForm.formState.errors.email?.message && (
+            <p className="text-red-500 text-sm">
+              {typeof forgotPasswordForm.formState.errors.email?.message ===
+              "string"
+                ? forgotPasswordForm.formState.errors.email?.message
+                : "Invalid Email"}
+            </p>
+          )}
+        </div>
+        <Button type="submit" className="w-full" disabled={isLoading}>
+          {isLoading ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Sending...
+            </>
+          ) : (
+            "Send Reset Instructions"
+          )}
+        </Button>
+      </form>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div className="space-y-2">
@@ -215,7 +355,12 @@ export function LoginForm() {
       </Button>
 
       <div className="text-center">
-        <Button variant="link" className="text-sm">
+        <Button
+          variant="link"
+          className="text-sm"
+          onClick={() => setCurrentView("forgot-password")}
+          type="button"
+        >
           Forgot your password?
         </Button>
       </div>

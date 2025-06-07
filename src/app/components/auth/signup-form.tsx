@@ -24,7 +24,11 @@ import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { usePasswordToggle } from "@/hooks/use-password-toggle";
 
-export function SignupForm() {
+interface SignupFormProps {
+  onSuccess?: () => void;
+}
+
+export function SignupForm({ onSuccess }: SignupFormProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingGoogleSignIn, setIsLoadingGoogleSignIn] = useState(false);
@@ -57,6 +61,7 @@ export function SignupForm() {
         toast.success(
           "Sign up successful! Please check your email to verify your account."
         );
+        onSuccess?.();
         setTimeout(() => {
           if (response?.data) {
             router.push(
