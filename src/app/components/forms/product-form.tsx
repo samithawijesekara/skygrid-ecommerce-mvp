@@ -32,6 +32,7 @@ const formSchema = z.object({
   content: z.string().min(1, "Content is required"),
   categoryIds: z.array(z.string()).min(1, "At least one category is required"),
   isPublished: z.boolean().default(false),
+  price: z.coerce.number().min(0, "Price is required and must be at least 0"),
   file: z.any().optional(),
 });
 
@@ -60,6 +61,7 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
       categoryIds:
         product?.categories?.map((cat: any) => cat.category.id) || [],
       isPublished: product?.isPublished || false,
+      price: product?.price ?? 0,
     },
   });
 
@@ -84,6 +86,7 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
       formData.append("title", values.title);
       formData.append("content", values.content);
       formData.append("isPublished", values.isPublished.toString());
+      formData.append("price", values.price.toString());
       values.categoryIds.forEach((id) => {
         formData.append("categoryIds[]", id);
       });
@@ -262,6 +265,28 @@ export function ProductForm({ product, onClose, onSuccess }: ProductFormProps) {
                     <div className="space-y-1 leading-none">
                       <FormLabel>Publish Product</FormLabel>
                     </div>
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="price"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className={formLabelClass}>Price</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        min={0}
+                        step="0.01"
+                        placeholder="Enter product price"
+                        {...field}
+                        value={field.value ?? ""}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
                   </FormItem>
                 )}
               />

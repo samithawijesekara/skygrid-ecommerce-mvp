@@ -11,6 +11,7 @@ const productSchema = z.object({
   categoryIds: z.array(z.string()).min(1, "At least one category is required"),
   isPublished: z.boolean().default(false),
   coverImage: z.string().nullable().optional(),
+  price: z.coerce.number().min(0, "Price is required and must be at least 0"),
 });
 
 /*
@@ -29,6 +30,7 @@ export async function POST(request: NextRequest) {
     const isPublished = formData.get("isPublished") === "true";
     const coverImage = formData.get("coverImage") as string | null;
     const categoryIds = formData.getAll("categoryIds[]") as string[];
+    const price = formData.get("price") as string;
 
     // Validate the data
     const validatedData = productSchema.parse({
@@ -37,6 +39,7 @@ export async function POST(request: NextRequest) {
       categoryIds,
       isPublished,
       coverImage,
+      price,
     });
 
     const product = await prisma.product.create({
@@ -53,6 +56,7 @@ export async function POST(request: NextRequest) {
             },
           })),
         },
+        price: validatedData.price,
       },
       include: {
         categories: {

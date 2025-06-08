@@ -10,6 +10,7 @@ const productSchema = z.object({
   categoryIds: z.array(z.string()).min(1, "At least one category is required"),
   isPublished: z.boolean().default(false),
   coverImage: z.string().nullable().optional(),
+  price: z.coerce.number().min(0, "Price is required and must be at least 0"),
 });
 
 export async function GET(
@@ -68,6 +69,7 @@ export async function PUT(
     const isPublished = formData.get("isPublished") === "true";
     const categoryIds = formData.getAll("categoryIds[]") as string[];
     const coverImage = formData.get("coverImage") as string | null;
+    const price = formData.get("price") as string;
 
     const validatedData = productSchema.parse({
       title,
@@ -75,6 +77,7 @@ export async function PUT(
       categoryIds,
       isPublished,
       coverImage,
+      price,
     });
 
     const { id } = await Promise.resolve(context.params);
@@ -107,6 +110,7 @@ export async function PUT(
             },
           })),
         },
+        price: validatedData.price,
       },
       include: {
         categories: {

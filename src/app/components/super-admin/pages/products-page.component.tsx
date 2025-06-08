@@ -273,6 +273,7 @@ export function ProductsPageComponent() {
                         )}
                       </div>
                     </TableHead>
+                    <TableHead className="py-4">Price</TableHead>
                     <TableHead className="py-4">Status</TableHead>
                     <TableHead className="py-4">Actions</TableHead>
                   </TableRow>
@@ -323,6 +324,11 @@ export function ProductsPageComponent() {
                       </TableCell>
                       <TableCell className="py-4">
                         {format(new Date(product.createdAt), "yyyy-MM-dd")}
+                      </TableCell>
+                      <TableCell className="py-4">
+                        {typeof product.price === "number"
+                          ? `USD ${product.price.toFixed(2)}`
+                          : "—"}
                       </TableCell>
                       <TableCell className="py-4">
                         <Badge
@@ -377,7 +383,7 @@ export function ProductsPageComponent() {
                   ))}
                   {!productsListData?.length && (
                     <TableRow>
-                      <TableCell colSpan={6} className="h-24 text-center">
+                      <TableCell colSpan={7} className="h-24 text-center">
                         No results.
                       </TableCell>
                     </TableRow>
