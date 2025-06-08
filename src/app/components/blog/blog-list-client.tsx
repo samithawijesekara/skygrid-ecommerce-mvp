@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { Blog, Category } from "@prisma/client";
+import { Blog, BlogCategory } from "@prisma/client";
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import {
@@ -19,7 +19,7 @@ import { BlogListSkeleton } from "@/components/loading-spinners/skelton-loaders"
 
 interface BlogWithRelations extends Blog {
   categories: {
-    category: Category;
+    category: BlogCategory;
   }[];
   createdBy: {
     firstName: string;
@@ -40,7 +40,7 @@ export default function BlogListClient() {
   const searchParams = useSearchParams();
 
   const [blogs, setBlogs] = useState<BlogWithRelations[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [categories, setCategories] = useState<BlogCategory[]>([]);
   const [totalPages, setTotalPages] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -52,7 +52,7 @@ export default function BlogListClient() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await fetch("/api/category");
+        const response = await fetch("/api/blog-category");
         const data = await response.json();
         setCategories(data.items);
       } catch (error) {

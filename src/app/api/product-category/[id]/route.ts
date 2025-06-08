@@ -22,7 +22,7 @@ export async function PUT(
 
     const { name, description } = await request.json();
 
-    const updatedCategory = await prisma.category.update({
+    const updatedCategory = await prisma.productCategory.update({
       where: { id },
       data: { name, description },
     });
@@ -58,7 +58,7 @@ export async function DELETE(
       );
     }
 
-    await prisma.category.delete({
+    await prisma.productCategory.delete({
       where: { id },
     });
 

@@ -90,7 +90,7 @@ export default function AllBlogsDataTableProvider() {
 
   const fetchCategories = async () => {
     try {
-      const response = await axios.get("/api/category", {
+      const response = await axios.get("/api/blog-category", {
         params: { take: 100, page: 1 },
       });
       setCategories(response.data.items);

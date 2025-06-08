@@ -18,9 +18,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, UserCheck, Mail, FileText, Tag, Activity } from "lucide-react";
 import { AnalyticsPageComponent } from "@/components/super-admin/pages/analytics-page.component";
 import { ProductsPageComponent } from "@/components/super-admin/pages/products-page.component";
-import { ProductsAddPageComponent } from "@/components/super-admin/pages/products-add-page.component";
+import { ProductDetailsPageComponent } from "@/components/super-admin/pages/product-details-page.component";
 
-export default function ProductsAddPage() {
+export default function ProductDetailsPage() {
   return (
     <>
       <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
@@ -36,16 +36,16 @@ export default function ProductsAddPage() {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>Add Product</BreadcrumbPage>
+                <BreadcrumbPage>Product Details</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>
       </header>
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <h1 className="text-4xl font-bold">Add Product</h1>
+        <h1 className="text-4xl font-bold">Product Details</h1>
         <Suspense fallback={<div>Loading metrics...</div>}>
-          <ProductsAddPageComponent />
+          <ProductDetailsPageComponent />
         </Suspense>
       </div>
     </>

@@ -56,11 +56,6 @@ const data = {
           icon: Layers,
         },
         {
-          title: "Add Product",
-          url: SUPER_ADMIN_ROUTES.PRODUCTS_ADD,
-          icon: Plus,
-        },
-        {
           title: "Categories",
           url: SUPER_ADMIN_ROUTES.PRODUCT_CATEGORIES,
           icon: Tag,

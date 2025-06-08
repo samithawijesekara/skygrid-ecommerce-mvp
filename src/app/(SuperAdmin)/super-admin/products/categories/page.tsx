@@ -42,7 +42,7 @@ export default function ProductCategoriesPage() {
         </div>
       </header>
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <h1 className="text-4xl font-bold">Product Categories Overview</h1>
+        <h1 className="text-4xl font-bold">Product Categories</h1>
         <Suspense fallback={<div>Loading metrics...</div>}>
           <ProductCategoriesPageComponent />
         </Suspense>

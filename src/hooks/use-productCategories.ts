@@ -5,12 +5,12 @@ interface Category {
   name: string;
 }
 
-export function useCategories() {
+export function useProductCategories() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/category")
+    fetch("/api/product-category")
       .then((res) => res.json())
       .then((data) => {
         setCategories(data.items || []);

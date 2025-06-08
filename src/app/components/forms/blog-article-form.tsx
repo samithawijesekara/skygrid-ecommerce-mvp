@@ -17,7 +17,7 @@ import { Card } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { Editor } from "../blog/editor";
 import { toast } from "react-toastify";
-import { useCategories } from "src/hooks/use-categories";
+import { useBlogCategories } from "src/hooks/use-blogCategories";
 import { ImageUpload } from "../ui/image-upload";
 import { MultiSelect } from "../ui/multi-select";
 import { useUser } from "src/store/useUser";
@@ -48,7 +48,7 @@ interface BlogArticleFormProps {
 export function BlogArticleForm({ blogId }: BlogArticleFormProps) {
   const { user } = useUser();
   const router = useRouter();
-  const { categories, loading } = useCategories();
+  const { categories, loading } = useBlogCategories();
   const [isDraftLoading, setIsDraftLoading] = useState(false);
   const [isPublishLoading, setIsPublishLoading] = useState(false);
   const [blog, setBlog] = useState<any>(null);

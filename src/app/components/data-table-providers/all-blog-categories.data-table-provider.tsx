@@ -29,9 +29,9 @@ import { DataTablePagination } from "../data-table-components/data-table-paginat
 import { TableSkeleton } from "../data-table-components/data-table-skeleton";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { toast } from "react-toastify";
-import { CategoryForm } from "../forms/category-form";
 import { DeleteConfirmDialog } from "../common/delete-confirm-dialog";
 import { Badge } from "../ui/badge";
+import { BlogCategoryForm } from "../forms/blog-category-form";
 
 export default function AllBlogCategoriesDataTableProvider() {
   const [sortByValueStr, setSortByValueStr] = useState<string>("createdAt");
@@ -91,7 +91,7 @@ export default function AllBlogCategoriesDataTableProvider() {
     };
 
     try {
-      const response = await axios.get(`/api/category`, { params });
+      const response = await axios.get(`/api/blog-category`, { params });
       setCategoriesListData(response.data.items);
       setPagination({
         total: response.data.total,
@@ -150,7 +150,7 @@ export default function AllBlogCategoriesDataTableProvider() {
     if (!categoryToDelete) return;
 
     try {
-      await axios.delete(`/api/category/${categoryToDelete}`);
+      await axios.delete(`/api/blog-category/${categoryToDelete}`);
       toast.success("Category deleted successfully");
       fetchCategoriesList();
     } catch (error: any) {
@@ -210,7 +210,7 @@ export default function AllBlogCategoriesDataTableProvider() {
             </Button>
           </SheetTrigger>
           <SheetContent className="sm:max-w-md">
-            <CategoryForm
+            <BlogCategoryForm
               category={selectedCategory}
               onClose={() => setIsCategoryFormOpen(false)}
               onSuccess={handleFormSuccess}

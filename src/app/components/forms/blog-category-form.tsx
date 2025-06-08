@@ -32,7 +32,7 @@ type CategoryFormProps = {
 
 const formLabelClass = "text-gray-700 font-medium";
 
-export function CategoryForm({
+export function BlogCategoryForm({
   category,
   onClose,
   onSuccess,
@@ -52,10 +52,10 @@ export function CategoryForm({
     try {
       setIsSubmitting(true);
       if (category) {
-        await axios.put(`/api/category/${category.id}`, values);
+        await axios.put(`/api/blog-category/${category.id}`, values);
         toast.success("Category updated successfully");
       } else {
-        await axios.post("/api/category", {
+        await axios.post("/api/blog-category", {
           ...values,
           createdById: user?.id,
         });

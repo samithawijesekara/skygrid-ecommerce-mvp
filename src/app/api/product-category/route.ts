@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const category = await prisma.category.create({
+    const category = await prisma.productCategory.create({
       data: {
         name,
         description,
@@ -66,7 +66,7 @@ export async function GET(request: NextRequest) {
     orderBy = { [sortBy]: order };
 
     const [categories, total] = await Promise.all([
-      prisma.category.findMany({
+      prisma.productCategory.findMany({
         where: whereClause,
         skip,
         take,
@@ -81,7 +81,7 @@ export async function GET(request: NextRequest) {
           deletedAt: true,
         },
       }),
-      prisma.category.count({ where: whereClause }),
+      prisma.productCategory.count({ where: whereClause }),
     ]);
 
     return NextResponse.json({
