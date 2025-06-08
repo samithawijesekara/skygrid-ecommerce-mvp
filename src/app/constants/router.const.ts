@@ -38,6 +38,13 @@ export const SUPER_ADMIN_ROUTES = {
   BLOG_ALL_ARTICLES: "/super-admin/blog/all",
   BLOG_ADD_ARTICLE: "/super-admin/blog/add",
   BLOG_CATEGORIES: "/super-admin/blog/categories",
+  // E-commerce routes
+  PRODUCTS: "/super-admin/products",
+  PRODUCT_CATEGORIES: "/super-admin/categories",
+  ORDERS: "/super-admin/orders",
+  REVENUE: "/super-admin/revenue",
+  HOTSPOTS: "/super-admin/hotspots",
+  ANALYTICS: "/super-admin/analytics",
   // Add here another routes...
 } as const;
 

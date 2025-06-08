@@ -17,6 +17,12 @@ import {
   Tag,
   Home,
   Rss,
+  ShoppingBag,
+  ShoppingCart,
+  DollarSign,
+  Flame,
+  BarChart3,
+  Layers,
 } from "lucide-react";
 import {
   Sidebar,
@@ -37,6 +43,42 @@ const data = {
       title: "Dashboard",
       url: SUPER_ADMIN_ROUTES.DASHBOARD,
       icon: PieChart,
+      isActive: false,
+    },
+    {
+      title: "Products",
+      url: SUPER_ADMIN_ROUTES.PRODUCTS,
+      icon: Layers,
+      isActive: false,
+    },
+    {
+      title: "Categories",
+      url: SUPER_ADMIN_ROUTES.PRODUCT_CATEGORIES,
+      icon: Tag,
+      isActive: false,
+    },
+    {
+      title: "Orders",
+      url: SUPER_ADMIN_ROUTES.ORDERS,
+      icon: ShoppingCart,
+      isActive: false,
+    },
+    {
+      title: "Revenue",
+      url: SUPER_ADMIN_ROUTES.REVENUE,
+      icon: DollarSign,
+      isActive: false,
+    },
+    {
+      title: "Hot Spots",
+      url: SUPER_ADMIN_ROUTES.HOTSPOTS,
+      icon: Flame,
+      isActive: false,
+    },
+    {
+      title: "Analytics",
+      url: SUPER_ADMIN_ROUTES.ANALYTICS,
+      icon: BarChart3,
       isActive: false,
     },
     {
