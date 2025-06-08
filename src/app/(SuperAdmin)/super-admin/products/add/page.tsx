@@ -16,9 +16,10 @@ import { SUPER_ADMIN_ROUTES } from "@/constants/router.const";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, UserCheck, Mail, FileText, Tag, Activity } from "lucide-react";
 import { AnalyticsPageComponent } from "@/components/super-admin/pages/analytics-page.component";
-import { CategoriesPageComponent } from "@/components/super-admin/pages/categories-page.component";
+import { ProductsPageComponent } from "@/components/super-admin/pages/products-page.component";
+import { ProductsAddPageComponent } from "@/components/super-admin/pages/products-add-page.component";
 
-export default function CategoriesPage() {
+export default function ProductsAddPage() {
   return (
     <>
       <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
@@ -38,9 +39,9 @@ export default function CategoriesPage() {
         </div>
       </header>
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <h1 className="text-4xl font-bold">Categories Overview</h1>
+        <h1 className="text-4xl font-bold">Add Product</h1>
         <Suspense fallback={<div>Loading metrics...</div>}>
-          <CategoriesPageComponent />
+          <ProductsAddPageComponent />
         </Suspense>
       </div>
     </>

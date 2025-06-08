@@ -39,8 +39,9 @@ export const SUPER_ADMIN_ROUTES = {
   BLOG_ADD_ARTICLE: "/super-admin/blog/add",
   BLOG_CATEGORIES: "/super-admin/blog/categories",
   // E-commerce routes
-  PRODUCTS: "/super-admin/products",
-  PRODUCT_CATEGORIES: "/super-admin/categories",
+  PRODUCTS: "/super-admin/products/all",
+  PRODUCTS_ADD: "/super-admin/products/add",
+  PRODUCT_CATEGORIES: "/super-admin/products/categories",
   ORDERS: "/super-admin/orders",
   REVENUE: "/super-admin/revenue",
   HOTSPOTS: "/super-admin/hotspots",

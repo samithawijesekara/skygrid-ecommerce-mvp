@@ -47,15 +47,25 @@ const data = {
     },
     {
       title: "Products",
-      url: SUPER_ADMIN_ROUTES.PRODUCTS,
+      url: "",
       icon: Layers,
-      isActive: false,
-    },
-    {
-      title: "Categories",
-      url: SUPER_ADMIN_ROUTES.PRODUCT_CATEGORIES,
-      icon: Tag,
-      isActive: false,
+      items: [
+        {
+          title: "All Products",
+          url: SUPER_ADMIN_ROUTES.PRODUCTS,
+          icon: Layers,
+        },
+        {
+          title: "Add Product",
+          url: SUPER_ADMIN_ROUTES.PRODUCTS_ADD,
+          icon: Plus,
+        },
+        {
+          title: "Categories",
+          url: SUPER_ADMIN_ROUTES.PRODUCT_CATEGORIES,
+          icon: Tag,
+        },
+      ],
     },
     {
       title: "Orders",
