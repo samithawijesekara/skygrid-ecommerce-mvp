@@ -37,7 +37,7 @@ export default function BlogList() {
         </div>
       </header>
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <h1 className="text-4xl">Blog Articles</h1>
+        <h1 className="text-4xl font-bold">Blog Articles</h1>
         <div className="h-full flex-1 flex-col space-y-2 p-8 md:flex">
           <BlogsMetrics />
           <div className="flex items-center justify-between">

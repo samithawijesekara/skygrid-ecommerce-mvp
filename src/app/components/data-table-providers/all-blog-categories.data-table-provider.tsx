@@ -33,7 +33,7 @@ import { CategoryForm } from "../forms/category-form";
 import { DeleteConfirmDialog } from "../common/delete-confirm-dialog";
 import { Badge } from "../ui/badge";
 
-export default function AllCategoriesDataTableProvider() {
+export default function AllBlogCategoriesDataTableProvider() {
   const [sortByValueStr, setSortByValueStr] = useState<string>("createdAt");
   const [sortingOrder, setSortingOrder] = useState<"asc" | "desc">("asc");
   const [searchValueStr, setSearchValueStr] = useState<string>("");

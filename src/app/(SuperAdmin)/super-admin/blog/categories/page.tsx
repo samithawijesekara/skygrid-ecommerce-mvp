@@ -15,7 +15,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar";
 import { SUPER_ADMIN_ROUTES } from "@/constants/router.const";
-import AllCategoriesDataTableProvider from "@/components/data-table-providers/all-categories.data-table-provider";
+import AllBlogCategoriesDataTableProvider from "@/components/data-table-providers/all-blog-categories.data-table-provider";
 
 export default function Categories() {
   return (
@@ -33,21 +33,21 @@ export default function Categories() {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>Categories</BreadcrumbPage>
+                <BreadcrumbPage>Blog Categories</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
         </div>
       </header>
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-        <h1 className="text-4xl">Categories</h1>
+        <h1 className="text-4xl font-bold">Blog Categories</h1>
         <div className="h-full flex-1 flex-col space-y-2 p-8 md:flex">
           <div className="flex items-center justify-between">
             <p className="text-muted-foreground">
-              Here&apos;s a list of all the users!
+              Here&apos;s a list of all the blog categories!
             </p>
           </div>
-          <AllCategoriesDataTableProvider />
+          <AllBlogCategoriesDataTableProvider />
         </div>
       </div>
     </>
