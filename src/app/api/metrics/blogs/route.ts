@@ -16,8 +16,8 @@ export async function GET() {
       by: ["createdById"],
       _count: { id: true },
     });
-    const totalCategories = await prisma.category.count();
-    const categoriesUsage = await prisma.category.findMany({
+    const totalCategories = await prisma.blogCategory.count();
+    const categoriesUsage = await prisma.blogCategory.findMany({
       include: {
         _count: {
           select: { blogs: true },

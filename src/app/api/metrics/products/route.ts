@@ -47,62 +47,6 @@ export async function GET() {
       _count: { id: true },
     });
 
-    // Content & Engagement Metrics
-    const totalBlogs = await prisma.blog.count();
-    const newBlogs30Days = await prisma.blog.count({
-      where: { createdAt: { gte: thirtyDaysAgo } },
-    });
-    const blogsPerUser = await prisma.blog.groupBy({
-      by: ["createdById"],
-      _count: { id: true },
-    });
-    const totalCategories = await prisma.blogCategory.count();
-    const categoriesUsage = await prisma.blogCategory.findMany({
-      include: {
-        _count: {
-          select: { blogs: true },
-        },
-      },
-    });
-    const blogActivity = await prisma.blog.findMany({
-      select: {
-        createdAt: true,
-      },
-      where: {
-        createdAt: {
-          gte: new Date(new Date().setMonth(new Date().getMonth() - 6)), // Last 6 months
-        },
-      },
-      orderBy: {
-        createdAt: 'asc',
-      },
-    });
-
-    // System & Activity Metrics
-    const recentSignups = await prisma.user.count({
-      where: { createdAt: { gte: sevenDaysAgo } },
-    });
-    const usersWithoutProfilePic = await prisma.user.count({
-      where: { profileImage: null },
-    });
-    const multipleAccounts = await prisma.account.groupBy({
-      by: ["userId"],
-      _count: { id: true },
-      having: {
-        id: {
-          _count: { gt: 1 },
-        },
-      },
-    });
-    const deletedUsers = await prisma.user.count({
-      where: { deletedAt: { not: null } },
-    });
-    const deletedBlogs = await prisma.blog.count({
-      where: { deletedAt: { not: null } },
-    });
-
-    console.log(totalUsers);
-
     return NextResponse.json({
       success: true,
       data: {
@@ -123,22 +67,6 @@ export async function GET() {
             ? (acceptedInvitations / totalInvitations) * 100
             : 0,
           invitationsByRole,
-        },
-        contentMetrics: {
-          totalBlogs,
-          newBlogs30Days,
-          averageBlogsPerUser: totalUsers ? totalBlogs / totalUsers : 0,
-          blogsPerUser,
-          totalCategories,
-          categoriesUsage,
-          blogActivity,
-        },
-        systemMetrics: {
-          recentSignups,
-          usersWithoutProfilePic,
-          usersWithMultipleAccounts: multipleAccounts.length,
-          deletedUsers,
-          deletedBlogs,
         },
       },
     });
