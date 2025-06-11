@@ -78,6 +78,7 @@ model User {
   orders            Order[] // One-to-many relation with Order
   shippingAddresses ShippingAddress[]
   favoriteProducts  FavoriteProduct[]
+  auditLogs         AuditLog[]
 }
 
 model Account {
@@ -238,10 +239,10 @@ model Product {
   updatedAt   DateTime  @updatedAt
   deletedAt   DateTime?
 
-  createdBy  User                     @relation(fields: [createdById], references: [id])
-  categories ProductCategoryMapping[]
-  cartItems  CartItem[] // Relation to CartItem
-  orderItems OrderItem[] // Relation to OrderItem
+  createdBy   User                     @relation(fields: [createdById], references: [id])
+  categories  ProductCategoryMapping[]
+  cartItems   CartItem[] // Relation to CartItem
+  orderItems  OrderItem[] // Relation to OrderItem
   favoritedBy FavoriteProduct[]
 }
 
@@ -364,18 +365,18 @@ model CartItem {
  */
 
 model ShippingAddress {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  street    String
-  city      String
-  state     String?
-  country   String
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String    @db.ObjectId
+  street     String
+  city       String
+  state      String?
+  country    String
   postalCode String
-  phone     String?
-  isDefault Boolean  @default(false)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  deletedAt DateTime?
+  phone      String?
+  isDefault  Boolean   @default(false)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -389,11 +390,11 @@ model ShippingAddress {
  */
 
 model FavoriteProduct {
-  id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String   @db.ObjectId
-  productId String   @db.ObjectId
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String    @db.ObjectId
+  productId String    @db.ObjectId
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -420,6 +421,89 @@ model ContactFormMessage {
   deletedAt  DateTime?
 
   category ContactFormCategoryType @relation(fields: [categoryId], references: [id])
+}
+
+/**
+ * *************************************************************************
+ * ================== Audit Logs Database Modals =====================
+ * *************************************************************************
+ */
+
+enum AuditLogAction {
+  // Authentication Actions
+  SIGN_IN
+  SIGN_OUT
+  REGISTER
+  GOOGLE_SIGN_IN
+  PASSWORD_RESET
+  EMAIL_VERIFICATION
+
+  // Cart Actions
+  ADD_TO_CART
+  REMOVE_FROM_CART
+  UPDATE_CART_ITEM
+  CLEAR_CART
+  VIEW_CART
+
+  // Order Actions
+  PLACE_ORDER
+  CANCEL_ORDER
+  VIEW_ORDER
+  TRACK_ORDER
+  CHECKOUT_START
+  CHECKOUT_COMPLETE
+  PAYMENT_SUCCESS
+  PAYMENT_FAILED
+
+  // Product Actions
+  VIEW_PRODUCT
+  SEARCH_PRODUCTS
+  FILTER_PRODUCTS
+  ADD_TO_FAVORITES
+  REMOVE_FROM_FAVORITES
+  RATE_PRODUCT
+  REVIEW_PRODUCT
+
+  // User Profile Actions
+  UPDATE_PROFILE
+  UPDATE_ADDRESS
+  DELETE_ADDRESS
+  SET_DEFAULT_ADDRESS
+  UPDATE_PREFERENCES
+
+  // Navigation Actions
+  PAGE_VISIT
+  MENU_CLICK
+  BANNER_CLICK
+  PROMOTION_CLICK
+  CATEGORY_VIEW
+
+  // Subscription Actions
+  SUBSCRIBE
+  UNSUBSCRIBE
+  UPGRADE_PLAN
+  DOWNGRADE_PLAN
+  CANCEL_SUBSCRIPTION
+
+  // Contact Actions
+  CONTACT_FORM_SUBMIT
+  NEWSLETTER_SUBSCRIBE
+  NEWSLETTER_UNSUBSCRIBE
+}
+
+model AuditLog {
+  id        String         @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String?        @db.ObjectId // Optional since we want to track non-authenticated users
+  action    AuditLogAction
+  page      String? // URL or page identifier
+  metadata  Json? // Additional data like productId, orderId, etc.
+  userAgent String? // Browser/device info
+  ipAddress String? // IP address for analytics
+  sessionId String? // Session identifier for anonymous users
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
 /**
