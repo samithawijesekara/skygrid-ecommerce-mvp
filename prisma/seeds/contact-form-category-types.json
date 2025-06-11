@@ -1,0 +1,22 @@
+[
+  {
+    "name": "General Inquiry",
+    "countryId": 1
+  },
+  {
+    "name": "Customer Support",
+    "countryId": 2
+  },
+  {
+    "name": "Order Inquiry",
+    "countryId": 3
+  },
+  {
+    "name": "Returns & Refunds",
+    "countryId": 4
+  },
+  {
+    "name": "Partnership",
+    "countryId": 5
+  }
+]

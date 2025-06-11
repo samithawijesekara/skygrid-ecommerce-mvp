@@ -3,7 +3,7 @@ import fs from "fs";
 import path from "path";
 import bcrypt from "bcrypt";
 import { UserRoleEnum } from "@/enums/user-role.enum";
-import { seedSubscriptionPlans } from './seeds/subscription-plans';
+import { seedSubscriptionPlans } from "./seeds/subscription-plans";
 
 const prisma = new PrismaClient();
 
@@ -79,6 +79,27 @@ async function main() {
       console.log("✅ User role types seeded!");
     } else {
       console.log("ℹ️ User role types already exist. Skipping seed.");
+    }
+
+    /**
+     * **********************************************************
+     * ================ Contact Form Category Types Seeding ===================
+     * **********************************************************
+     */
+    const contactFormCategoryTypes = loadSeedData(
+      "./prisma/seeds/contact-form-category-types.json"
+    );
+    const existingContactFormCategoryTypes =
+      await prisma.contactFormCategoryType.findMany();
+    if (existingContactFormCategoryTypes.length === 0) {
+      await prisma.contactFormCategoryType.createMany({
+        data: contactFormCategoryTypes,
+      });
+      console.log("✅ Contact form category types seeded!");
+    } else {
+      console.log(
+        "ℹ️ Contact form category types already exist. Skipping seed."
+      );
     }
 
     // Seed subscription plans

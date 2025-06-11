@@ -355,6 +355,26 @@ model CartItem {
 }
 
 /**
+ * *********************************************************************************
+ * ================== Contact form messages Database Modals =====================
+ * *********************************************************************************
+ */
+
+model ContactFormMessage {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  name      String?
+  email     String?
+  subject   String?
+  message   String?
+  categoryId String   @db.ObjectId
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  category ContactFormCategoryType @relation(fields: [categoryId], references: [id])
+}
+
+/**
  * **********************************************************
  * ================ Types Database Modals ===================
  * **********************************************************
@@ -377,6 +397,17 @@ model UserRoleType {
   deletedAt DateTime?
 
   invitations Invitation[]
+}
+
+model ContactFormCategoryType {
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
+  countryId Int       @unique
+  name      String    @unique
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  messages ContactFormMessage[]
 }
 
 // Add Address type for embedded documents
