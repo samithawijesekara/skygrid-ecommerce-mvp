@@ -76,6 +76,7 @@ model User {
   blogCategories    BlogCategory[]
   cart              Cart? // One-to-one relation with Cart
   orders            Order[] // One-to-many relation with Order
+  shippingAddresses ShippingAddress[]
 }
 
 model Account {
@@ -355,21 +356,46 @@ model CartItem {
 }
 
 /**
+ * *************************************************************************
+ * ================== Shipping Address Database Modals =====================
+ * *************************************************************************
+ */
+
+model ShippingAddress {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  street    String
+  city      String
+  state     String?
+  country   String
+  postalCode String
+  phone     String?
+  isDefault Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, isDefault], name: "unique_default_address_per_user")
+}
+
+/**
  * *********************************************************************************
  * ================== Contact form messages Database Modals =====================
  * *********************************************************************************
  */
 
 model ContactFormMessage {
-  id        String    @id @default(auto()) @map("_id") @db.ObjectId
-  name      String?
-  email     String?
-  subject   String?
-  message   String?
-  categoryId String   @db.ObjectId
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  id         String    @id @default(auto()) @map("_id") @db.ObjectId
+  name       String?
+  email      String?
+  subject    String?
+  message    String?
+  categoryId String    @db.ObjectId
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  deletedAt  DateTime?
 
   category ContactFormCategoryType @relation(fields: [categoryId], references: [id])
 }
