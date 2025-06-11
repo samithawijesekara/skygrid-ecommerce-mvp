@@ -77,6 +77,7 @@ model User {
   cart              Cart? // One-to-one relation with Cart
   orders            Order[] // One-to-many relation with Order
   shippingAddresses ShippingAddress[]
+  favoriteProducts  FavoriteProduct[]
 }
 
 model Account {
@@ -241,6 +242,7 @@ model Product {
   categories ProductCategoryMapping[]
   cartItems  CartItem[] // Relation to CartItem
   orderItems OrderItem[] // Relation to OrderItem
+  favoritedBy FavoriteProduct[]
 }
 
 model ProductCategory {
@@ -378,6 +380,26 @@ model ShippingAddress {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, isDefault], name: "unique_default_address_per_user")
+}
+
+/**
+ * *************************************************************************
+ * ================== Favorite Product Database Modals =====================
+ * *************************************************************************
+ */
+
+model FavoriteProduct {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String   @db.ObjectId
+  productId String   @db.ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId], name: "unique_user_product_favorite")
 }
 
 /**
