@@ -1,16 +1,23 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useToast } from "@/components/ui/use-toast"
-import { Send } from "lucide-react"
+import type React from "react";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Send } from "lucide-react";
+import axios from "axios";
+import { ContactFormCategoryType } from "@prisma/client";
+import { toast } from "react-toastify";
 
 export function ContactForm() {
   const [formData, setFormData] = useState({
@@ -18,36 +25,62 @@ export function ContactForm() {
     email: "",
     subject: "",
     message: "",
-    category: "",
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const { toast } = useToast()
+    categoryId: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [categories, setCategories] = useState<ContactFormCategoryType[]>([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(true);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get("/api/types/contact-form-categories");
+        setCategories(response.data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+        toast.error(
+          "Failed to load contact form categories. Please try again later."
+        );
+      } finally {
+        setIsLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+    e.preventDefault();
+    setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 1000))
+    try {
+      const response = await axios.post("/api/contact-form-message", formData);
 
-    toast({
-      title: "Message sent!",
-      description: "Thank you for contacting us. We'll get back to you soon.",
-    })
-
-    setFormData({
-      name: "",
-      email: "",
-      subject: "",
-      message: "",
-      category: "",
-    })
-    setIsSubmitting(false)
-  }
+      if (response.status === 201) {
+        // Reset form
+        setFormData({
+          name: "",
+          email: "",
+          subject: "",
+          message: "",
+          categoryId: "",
+        });
+        toast.success("Message sent successfully!");
+      }
+    } catch (error: any) {
+      console.error("Error submitting form:", error);
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to send message. Please try again."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <Card>
@@ -83,16 +116,26 @@ export function ContactForm() {
 
           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
-            <Select onValueChange={(value) => handleInputChange("category", value)}>
+            <Select
+              value={formData.categoryId}
+              onValueChange={(value) => handleInputChange("categoryId", value)}
+              disabled={isLoadingCategories}
+            >
               <SelectTrigger>
-                <SelectValue placeholder="Select a category" />
+                <SelectValue
+                  placeholder={
+                    isLoadingCategories
+                      ? "Loading categories..."
+                      : "Select a category"
+                  }
+                />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="general">General Inquiry</SelectItem>
-                <SelectItem value="support">Customer Support</SelectItem>
-                <SelectItem value="orders">Order Issues</SelectItem>
-                <SelectItem value="returns">Returns & Refunds</SelectItem>
-                <SelectItem value="partnership">Partnership</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.name}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -118,11 +161,17 @@ export function ContactForm() {
             />
           </div>
 
-          <Button type="submit" className="w-full" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={
+              isSubmitting || isLoadingCategories || !formData.categoryId
+            }
+          >
             {isSubmitting ? "Sending..." : "Send Message"}
           </Button>
         </form>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -110,3 +110,102 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+/*
+ * Update a contact form message's read status as bulk or single
+ */
+export async function PUT(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const { messageIds, isRead } = await request.json();
+
+    if (!Array.isArray(messageIds) || messageIds.length === 0) {
+      return NextResponse.json(
+        { message: "Message IDs array is required and must not be empty" },
+        { status: 400 }
+      );
+    }
+
+    if (typeof isRead !== "boolean") {
+      return NextResponse.json(
+        { message: "isRead status is required and must be a boolean" },
+        { status: 400 }
+      );
+    }
+
+    // First, check if the message exists at all
+    const allMessages = await prisma.contactFormMessage.findMany({
+      where: {
+        id: {
+          in: messageIds,
+        },
+      },
+      select: {
+        id: true,
+        isRead: true,
+        deletedAt: true,
+      },
+    });
+
+    if (allMessages.length === 0) {
+      return NextResponse.json(
+        {
+          message: "No messages found with the provided IDs",
+          searchedIds: messageIds,
+        },
+        { status: 404 }
+      );
+    }
+
+    // Update all messages in the array
+    const updatedMessages = await prisma.contactFormMessage.updateMany({
+      where: {
+        id: {
+          in: messageIds,
+        },
+        // deletedAt: null, // Only update non-deleted messages
+      },
+      data: {
+        isRead,
+        updatedAt: new Date(),
+      },
+    });
+
+    // Verify the update
+    const updatedMessagesAfter = await prisma.contactFormMessage.findMany({
+      where: {
+        id: {
+          in: messageIds,
+        },
+        // deletedAt: null,
+      },
+      select: {
+        id: true,
+        isRead: true,
+      },
+    });
+
+    console.log("Messages after update:", updatedMessagesAfter);
+
+    return NextResponse.json({
+      message: "Messages updated successfully",
+      count: updatedMessages.count,
+      updatedIds: messageIds,
+      beforeUpdate: allMessages,
+      afterUpdate: updatedMessagesAfter,
+    });
+  } catch (error) {
+    console.error("Error bulk updating contact form messages:", error);
+    return NextResponse.json(
+      {
+        message: "Failed to update contact form messages",
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
+      { status: 500 }
+    );
+  }
+}

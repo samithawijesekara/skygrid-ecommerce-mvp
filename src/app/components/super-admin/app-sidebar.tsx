@@ -23,6 +23,7 @@ import {
   Flame,
   BarChart3,
   Layers,
+  MessageCircle,
 } from "lucide-react";
 import {
   Sidebar,
@@ -84,6 +85,12 @@ const data = {
       title: "Analytics",
       url: SUPER_ADMIN_ROUTES.ANALYTICS,
       icon: BarChart3,
+      isActive: false,
+    },
+    {
+      title: "Inquiry Messages",
+      url: SUPER_ADMIN_ROUTES.INQUIRY_MESSAGES,
+      icon: MessageCircle,
       isActive: false,
     },
     {

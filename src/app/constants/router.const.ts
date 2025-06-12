@@ -46,6 +46,7 @@ export const SUPER_ADMIN_ROUTES = {
   REVENUE: "/super-admin/revenue",
   HOTSPOTS: "/super-admin/hotspots",
   ANALYTICS: "/super-admin/analytics",
+  INQUIRY_MESSAGES: "/super-admin/inquiry-messages",
   // Add here another routes...
 } as const;
 
