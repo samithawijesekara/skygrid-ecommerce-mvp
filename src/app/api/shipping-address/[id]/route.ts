@@ -8,9 +8,10 @@ import { authOptions } from "src/pages/api/auth/[...nextauth]";
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -26,7 +27,7 @@ export async function GET(
 
     const address = await prisma.shippingAddress.findFirst({
       where: {
-        id: params.id,
+        id,
         userId: user.id,
         deletedAt: null,
       },
@@ -54,9 +55,17 @@ export async function GET(
  */
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: addressId } = await params;
+    if (!addressId) {
+      return NextResponse.json(
+        { message: "Address ID is required" },
+        { status: 400 }
+      );
+    }
+
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -80,36 +89,80 @@ export async function PUT(
       );
     }
 
-    // Check if address exists and belongs to user
-    const existingAddress = await prisma.shippingAddress.findFirst({
-      where: {
-        id: params.id,
-        userId: user.id,
-        deletedAt: null,
+    // First check if the address exists at all
+    const addressExists = await prisma.shippingAddress.findUnique({
+      where: { id: addressId },
+      select: {
+        id: true,
+        userId: true,
+        deletedAt: true,
+        street: true,
+        city: true,
+        country: true,
+        isDefault: true,
       },
     });
 
-    if (!existingAddress) {
+    if (!addressExists) {
       return NextResponse.json(
         { message: "Shipping address not found" },
         { status: 404 }
       );
     }
 
-    // If this is going to be the default address, unset any existing default
+    // Direct comparison of user IDs
+    const userIdsMatch = addressExists.userId === user.id;
+    if (!userIdsMatch || addressExists.deletedAt) {
+      return NextResponse.json(
+        {
+          message: "You don't have permission to update this address",
+          details: {
+            addressExists: true,
+            addressUserId: addressExists.userId,
+            currentUserId: user.id,
+            userIdsMatch,
+            isDeleted: !!addressExists.deletedAt,
+          },
+        },
+        { status: 403 }
+      );
+    }
+
+    // Handle default address logic
     if (isDefault) {
+      // First, unset any existing default address
       await prisma.shippingAddress.updateMany({
         where: {
           userId: user.id,
           isDefault: true,
-          id: { not: params.id }, // Don't update the current address
+          id: { not: addressId },
+          deletedAt: null,
         },
         data: { isDefault: false },
       });
+    } else if (addressExists.isDefault) {
+      // If this was the default address and we're unsetting it,
+      // find another address to make default
+      const nextAddress = await prisma.shippingAddress.findFirst({
+        where: {
+          userId: user.id,
+          id: { not: addressId },
+          deletedAt: null,
+        },
+        orderBy: { createdAt: "desc" },
+      });
+
+      if (nextAddress) {
+        await prisma.shippingAddress.update({
+          where: { id: nextAddress.id },
+          data: { isDefault: true },
+        });
+      }
     }
 
+    // Update the address
     const updatedAddress = await prisma.shippingAddress.update({
-      where: { id: params.id },
+      where: { id: addressId },
       data: {
         street,
         city,
@@ -117,7 +170,7 @@ export async function PUT(
         country,
         postalCode,
         phone,
-        isDefault: isDefault || false,
+        isDefault: isDefault ?? addressExists.isDefault, // Keep existing default status if not specified
       },
     });
 
@@ -135,13 +188,21 @@ export async function PUT(
 }
 
 /*
- * Delete a shipping address (soft delete)
+ * Delete a shipping address (hard delete)
  */
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: addressId } = await params;
+    if (!addressId) {
+      return NextResponse.json(
+        { message: "Address ID is required" },
+        { status: 400 }
+      );
+    }
+
     const session = await getServerSession(authOptions);
     if (!session?.user?.email) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -156,45 +217,42 @@ export async function DELETE(
     }
 
     // Check if address exists and belongs to user
-    const existingAddress = await prisma.shippingAddress.findFirst({
-      where: {
-        id: params.id,
-        userId: user.id,
-        deletedAt: null,
+    const addressExists = await prisma.shippingAddress.findUnique({
+      where: { id: addressId },
+      select: {
+        id: true,
+        userId: true,
       },
     });
 
-    if (!existingAddress) {
+    if (!addressExists) {
       return NextResponse.json(
         { message: "Shipping address not found" },
         { status: 404 }
       );
     }
 
-    // Soft delete by setting deletedAt
-    await prisma.shippingAddress.update({
-      where: { id: params.id },
-      data: { deletedAt: new Date() },
-    });
-
-    // If the deleted address was the default, set another address as default
-    if (existingAddress.isDefault) {
-      const nextAddress = await prisma.shippingAddress.findFirst({
-        where: {
-          userId: user.id,
-          deletedAt: null,
-          id: { not: params.id },
+    // Check if address belongs to user
+    const userIdsMatch = addressExists.userId === user.id;
+    if (!userIdsMatch) {
+      return NextResponse.json(
+        {
+          message: "You don't have permission to delete this address",
+          details: {
+            addressExists: true,
+            addressUserId: addressExists.userId,
+            currentUserId: user.id,
+            userIdsMatch,
+          },
         },
-        orderBy: { createdAt: "desc" },
-      });
-
-      if (nextAddress) {
-        await prisma.shippingAddress.update({
-          where: { id: nextAddress.id },
-          data: { isDefault: true },
-        });
-      }
+        { status: 403 }
+      );
     }
+
+    // Perform hard delete
+    await prisma.shippingAddress.delete({
+      where: { id: addressId },
+    });
 
     return NextResponse.json({
       message: "Shipping address deleted successfully",

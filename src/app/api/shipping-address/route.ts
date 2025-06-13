@@ -76,22 +76,24 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
+    console.log("00 session", session);
+
     // Get user ID from session
     const user = await prisma.user.findUnique({
       where: { email: session.user.email },
     });
-
     if (!user) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
+    console.log("01 user", user);
 
     const addresses = await prisma.shippingAddress.findMany({
       where: {
         userId: user.id,
-        deletedAt: null,
       },
       orderBy: [{ isDefault: "desc" }, { createdAt: "desc" }],
     });
+    console.log("02 addresses", addresses);
 
     return NextResponse.json(addresses);
   } catch (error) {
